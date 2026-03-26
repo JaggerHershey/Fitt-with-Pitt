@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Nutrition Page</h1>
-    <p>Current Nutrition</p>
-    <a href="{{ url_for('home') }}">Home</a>
+<h1>Nutrition Page</h1>
+<p>Current Nutrition</p>
+<a href="{{ url_for('home') }}">Home</a>
+<footer>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</footer>
 {% endblock %}

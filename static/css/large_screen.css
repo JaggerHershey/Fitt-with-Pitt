@@ -6,6 +6,9 @@
 
 header {
     background-color: #1E1E1E;
+    text-align: center;
+    display: inline-block;
+    width: 100%;
 }
 
 h1 {
