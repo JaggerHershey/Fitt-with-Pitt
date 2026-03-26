@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 from models.user_model import User
 from models.nutrition_model import Nutrition
 from models.activity_model import Activity
+from models.goal_model import Goal
 
 # Initialize flask application and configure database
 app = Flask(__name__)
