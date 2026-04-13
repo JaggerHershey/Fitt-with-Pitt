@@ -41,10 +41,34 @@ def home():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/nutrition')
+@app.route('/nutrition', methods=['GET', 'POST'])
 @login_required
 def nutrition():
-    return render_template('nutrition.html')
+    if request.method == 'POST':
+        food_name = request.form.get("food_name")
+        serving_size = request.form.get('serving_size')
+        num_calories = request.form.get('num_calories')
+        grams_of_protein = request.form.get('grams_of_protein')
+        grams_of_carb = request.form.get('grams_of_carb')
+        grams_of_fat = request.form.get('grams_of_fat')
+        user_notes = request.form.get('user_notes')
+
+        new_meal = Nutrition(
+            food_name=food_name,
+            serving_size=serving_size,
+            num_calories=num_calories,
+            grams_of_protein=grams_of_protein,
+            grams_of_carb=grams_of_carb,
+            grams_of_fat=grams_of_fat,
+            user_notes=user_notes
+        )
+        db.session.add(new_meal)
+        db.session.commit()
+
+        return redirect(url_for('nutrition'))
+    else:
+        entries = Nutrition.query.all()
+        return render_template('nutrition.html', entries=entries)
 
 @app.route('/activity')
 @login_required
