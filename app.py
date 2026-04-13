@@ -4,7 +4,8 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 from models.user_model import User
 from models.nutrition_model import Nutrition
 from models.activity_model import Activity
-from models.goal_model import Goal
+from models.goal_model import Goal, ActivityGoal
+from datetime import datetime, timedelta
 
 # Initialize flask application and configure database
 app = Flask(__name__)
@@ -87,44 +88,91 @@ def activity():
             num_set=num_set,
             num_reps=num_reps,
             calories_burned=calories_burned,
-            user_notes=user_notes
+            user_notes=user_notes,
+            user_id=current_user.id
         )
         db.session.add(new_activity)
         db.session.commit()
 
         return redirect(url_for('activity'))
     else:
-        entries = Activity.query.all()
-        return render_template('activity.html', entries=entries)
+        # Get user's activities only
+        entries = Activity.query.filter_by(user_id=current_user.id).order_by(Activity.created_at.desc()).all()
+        
+        # Calculate weekly stats
+        today = datetime.utcnow()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        weekly_workouts = Activity.query.filter(
+            Activity.user_id == current_user.id,
+            Activity.created_at >= start_of_week
+        ).all()
+        
+        weekly_count = len(weekly_workouts)
+        weekly_calories = sum(w.calories_burned or 0 for w in weekly_workouts)
+        weekly_sets = sum(w.num_set or 0 for w in weekly_workouts)
+        weekly_reps = sum(w.num_reps or 0 for w in weekly_workouts)
+        
+        # Get user's workout goal (default to 4)
+        activity_goal = ActivityGoal.query.filter_by(user_id=current_user.id).first()
+        weekly_goal = activity_goal.weekly_workouts if activity_goal else 4
+        
+        # Calculate ring progress
+        ring_progress = min(100, int((weekly_count / weekly_goal) * 100)) if weekly_goal > 0 else 0
+        
+        return render_template('activity.html', 
+            entries=entries,
+            weekly_count=weekly_count,
+            weekly_calories=weekly_calories,
+            weekly_sets=weekly_sets,
+            weekly_reps=weekly_reps,
+            weekly_goal=weekly_goal,
+            ring_progress=ring_progress
+        )
+
+@app.route('/set_workout_goal', methods=['POST'])
+@login_required
+def set_workout_goal():
+    weekly_workouts = request.form.get('weekly_workouts', type=int)
+    
+    if weekly_workouts and weekly_workouts > 0:
+        existing_goal = ActivityGoal.query.filter_by(user_id=current_user.id).first()
+        
+        if existing_goal:
+            existing_goal.weekly_workouts = weekly_workouts
+        else:
+            new_goal = ActivityGoal(
+                user_id=current_user.id,
+                target_value=weekly_workouts,
+                weekly_workouts=weekly_workouts
+            )
+            db.session.add(new_goal)
+        
+        db.session.commit()
+        flash(f"Weekly workout goal set to {weekly_workouts}!", "success")
+    
+    return redirect(url_for('activity'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Current user already logged in
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     
-    # Otherwise deal with associated request
     if request.method == 'POST':
         username = request.form.get("username")
         password = request.form.get("password")
-        # Potentially add 'remember' checkbox and change login to associated value
-        # Current default is remember=True
 
-        # Check user exists
         user = User.query.filter_by(username=username).first()
         if user is None:
             flash("User does not exist, please make an account.", "info")
             return render_template('login.html', error='Invalid credentials')
-        # Check user against database hashed info
-        # If authorized, login and redirect to home
         if user.check_password(password=password):
             login_user(user, remember=True)
-            # Route to requested page
             next = request.args.get('next')
             if next:
                 return redirect(next)
             return redirect(url_for('home'))
-        # Otherwise throw login error
         else:
             return render_template('login.html', error='Invalid credentials')
     else:
@@ -137,7 +185,6 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        # Check if username or email is unique throw error if not
         existing_username = User.query.filter_by(username=username).first()
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
@@ -147,15 +194,12 @@ def register():
             flash("Username is already taken. Please choose another.", "info")
             return redirect(url_for('register'))
         else:
-            # Set new user specifications
             new_user = User(username=username, email=email)
             new_user.set_password(password)
-            # Save new user in database
             db.session.add(new_user)
             db.session.commit()
         
         return redirect(url_for('login'))
-
     else:
         return render_template('register.html')
 
