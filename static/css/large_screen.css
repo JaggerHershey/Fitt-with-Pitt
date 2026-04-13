@@ -348,36 +348,31 @@ button { font-family: inherit; }
     letter-spacing: 0.6px;
     margin-bottom: 8px;
 }
+
 .stat-value {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -1px;
-    line-height: 1;
-    margin-bottom: 4px;
 }
+.stat-card.highlight .stat-value {
+    color: var(--accent);
+}
+
 .stat-unit {
     font-size: 12px;
     color: var(--text-muted);
+    margin-top: 2px;
 }
-.stat-card.highlight {
-    border-color: rgba(34, 197, 94, 0.2);
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, var(--bg-surface) 100%);
-}
-.stat-card.highlight .stat-value { color: var(--accent); }
 
 /* ============================
-   GRID HELPERS
+   TWO-COLUMN LAYOUT
    ============================ */
 .two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-}
-.three-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
+    align-items: start;
 }
 
 /* ============================
@@ -731,3 +726,126 @@ button { font-family: inherit; }
     border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ============================
+   ACTIVITY RING
+   ============================ */
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.ring-card {
+    text-align: center;
+}
+
+.activity-ring-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 12px;
+}
+
+.activity-ring {
+    width: 100%;
+    height: 100%;
+}
+
+.ring-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.ring-percent {
+    display: block;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ring-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.ring-message {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ============================
+   MINI STATS GRID
+   ============================ */
+.mini-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.mini-stat {
+    background: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+}
+
+.mini-stat.highlight {
+    background: var(--accent-dim);
+}
+
+.mini-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.mini-stat.highlight .mini-stat-value {
+    color: var(--accent);
+}
+
+.mini-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* ============================
+   MODAL
+   ============================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+}

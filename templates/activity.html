@@ -40,7 +40,7 @@
         
         <div class="ring-message">
             {% if ring_progress >= 100 %}
-                <span class="text-accent"> Nicely done, you closed all of your rings! </span>
+                <span class="text-accent"> You closed your ring for the week! See you next week. </span>
             {% elif weekly_goal - weekly_count == 1 %}
                 <span>1 more workout to go!</span>
             {% else %}
@@ -187,127 +187,5 @@
         </form>
     </div>
 </div>
-
-<style>
-.stats-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.ring-card {
-    text-align: center;
-}
-
-.activity-ring-container {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    margin: 0 auto 12px;
-}
-
-.activity-ring {
-    width: 100%;
-    height: 100%;
-}
-
-.ring-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-.ring-percent {
-    display: block;
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.ring-label {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.ring-message {
-    font-size: 13px;
-    color: var(--text-secondary);
-}
-
-.mini-stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.mini-stat {
-    background: var(--bg-elevated);
-    border-radius: var(--radius);
-    padding: 16px;
-    text-align: center;
-}
-
-.mini-stat.highlight {
-    background: var(--accent-dim);
-}
-
-.mini-stat-value {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.mini-stat.highlight .mini-stat-value {
-    color: var(--accent);
-}
-
-.mini-stat-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 24px;
-    width: 100%;
-    max-width: 320px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.modal-title {
-    font-size: 16px;
-    font-weight: 600;
-}
-
-@media (max-width: 600px) {
-    .stats-row {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 
 {% endblock %}
