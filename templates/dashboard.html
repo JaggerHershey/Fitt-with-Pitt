@@ -82,7 +82,7 @@
             </svg>
             <p>No meals logged today</p>
             <a href="{{ url_for('nutrition') }}" class="btn btn-secondary btn-sm">Log a meal</a>
-            {% endif %}
+            {% else %}
             <div class="table-wrap">
                 <table class="data-table">
                     <thead>
@@ -109,6 +109,7 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
         </div>
     </div>
 
@@ -125,7 +126,7 @@
             </svg>
             <p>No workouts logged today</p>
             <a href="{{ url_for('activity') }}" class="btn btn-secondary btn-sm">Log a workout</a>
-            {% endif %}
+            {% else %}
             <div class="table-wrap">
                 <table class="data-table">
                     <thead>
@@ -134,8 +135,8 @@
                             <th>Muscle Group</th>
                             <th>Sets</th>
                             <th>Reps</th>
-                            <th>Calories Burned</th>
-                            <th>Notes</th>
+                            <th>Calories</th>
+                            <th>Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,15 +144,16 @@
                         <tr>
                             <td>{{ entry.workout_name }}</td>
                             <td><span class="badge badge-green">{{ entry.muscle_group }}</span></td>
-                            <td>{{ entry.num_set }}</td>
-                            <td>{{ entry.num_reps }}</td>
-                            <td>{{ entry.calories_burned }} kcal</td>
-                            <td class="text-secondary">{{ entry.user_notes or '—' }}</td>
+                            <td>{{ entry.num_set or '—' }}</td>
+                            <td>{{ entry.num_reps or '—' }}</td>
+                            <td>{{ entry.calories_burned or 0 }}</td>
+                            <td class="text-secondary">{{ entry.created_at.strftime('%b %d') if entry.created_at else '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

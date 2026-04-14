@@ -131,8 +131,7 @@
         </svg>
         <p>No meals logged yet — add your first meal above</p>
     </div>
-    {% endif %}
-    
+    {% else %}
     <!-- Once entries are passed from the route, replace the empty state with: -->
     <div class="table-wrap">
         <table class="data-table">
@@ -160,7 +159,7 @@
             </tbody>
         </table>
     </div>
-   
+    {% endif %}
 </div>
 
 {% endblock %}
