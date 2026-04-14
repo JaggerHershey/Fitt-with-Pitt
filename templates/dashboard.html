@@ -71,6 +71,7 @@
             <a href="{{ url_for('nutrition') }}" class="btn btn-ghost btn-sm">View all</a>
         </div>
         <div class="empty-state">
+            {% if not nutrition_entries %}
             <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
@@ -81,6 +82,33 @@
             </svg>
             <p>No meals logged today</p>
             <a href="{{ url_for('nutrition') }}" class="btn btn-secondary btn-sm">Log a meal</a>
+            {% endif %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Food</th>
+                            <th>Serving</th>
+                            <th>Calories</th>
+                            <th>Protein</th>
+                            <th>Carbs</th>
+                            <th>Fat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in nutrition_entries %}
+                        <tr>
+                            <td>{{ entry.food_name }}</td>
+                            <td>{{ entry.serving_size }}g</td>
+                            <td>{{ entry.num_calories }} kcal</td>
+                            <td>{{ entry.grams_of_protein }}g</td>
+                            <td>{{ entry.grams_of_carb }}g</td>
+                            <td>{{ entry.grams_of_fat }}g</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -90,12 +118,40 @@
             <a href="{{ url_for('activity') }}" class="btn btn-ghost btn-sm">View all</a>
         </div>
         <div class="empty-state">
+            {% if not activity_entries %}
             <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
             <p>No workouts logged today</p>
             <a href="{{ url_for('activity') }}" class="btn btn-secondary btn-sm">Log a workout</a>
+            {% endif %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Exercise</th>
+                            <th>Muscle Group</th>
+                            <th>Sets</th>
+                            <th>Reps</th>
+                            <th>Calories Burned</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in activity_entries %}
+                        <tr>
+                            <td>{{ entry.workout_name }}</td>
+                            <td><span class="badge badge-green">{{ entry.muscle_group }}</span></td>
+                            <td>{{ entry.num_set }}</td>
+                            <td>{{ entry.num_reps }}</td>
+                            <td>{{ entry.calories_burned }} kcal</td>
+                            <td class="text-secondary">{{ entry.user_notes or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
