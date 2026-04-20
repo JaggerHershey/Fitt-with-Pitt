@@ -150,12 +150,13 @@
                 {% for entry in entries %}
                 <tr>
                     <td>{{ entry.food_name }}</td>
-                    <td>{{ entry.serving_size }}g</td>
-                    <td>{{ entry.num_calories }} kcal</td>
-                    <td>{{ entry.grams_of_protein }}g</td>
-                    <td>{{ entry.grams_of_carb }}g</td>
-                    <td>{{ entry.grams_of_fat }}g</td>
+                    <td>{% if entry.serving_size is not none and entry.serving_size != '' %}{{ entry.serving_size }}g{% else %}—{% endif %}</td>
+                    <td>{% if entry.num_calories is not none and entry.num_calories != '' %}{{ entry.num_calories }} kcal{% else %}—{% endif %}</td>
+                    <td>{% if entry.grams_of_protein is not none and entry.grams_of_protein != '' %}{{ entry.grams_of_protein }}g{% else %}—{% endif %}</td>
+                    <td>{% if entry.grams_of_carb is not none and entry.grams_of_carb != '' %}{{ entry.grams_of_carb }}g{% else %}—{% endif %}</td>
+                    <td>{% if entry.grams_of_fat is not none and entry.grams_of_fat != '' %}{{ entry.grams_of_fat }}g{% else %}—{% endif %}</td>
                     <td class="text-secondary">{{ entry.created_at.strftime('%b %d') if entry.created_at else '—' }}</td>
+
                 </tr>
                 {% endfor %}
             </tbody>

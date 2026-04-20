@@ -1,5 +1,5 @@
 from models import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,7 +12,7 @@ class Activity(db.Model):
     muscle_group = db.Column(db.String(50), nullable=False)
     
     
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -570,6 +570,7 @@ button { font-family: inherit; }
 .flash {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 10px 14px;
     border-radius: var(--radius);
@@ -700,6 +701,43 @@ button { font-family: inherit; }
 .mb-4 { margin-bottom: 16px; }
 .mt-6 { margin-top: 24px; }
 .mb-6 { margin-bottom: 24px; }
+
+/* ============================
+   CHART CONTROLS
+   ============================ */
+.chart-select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition);
+}
+.chart-select:hover,
+.chart-select:focus { border-color: var(--border-strong); }
+
+.chart-metric-tabs {
+    display: flex;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.chart-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+}
+.chart-tab:hover { background: var(--bg-hover); color: var(--text-primary); }
+.chart-tab.active { background: var(--accent-dim); color: var(--accent); }
 
 /* ============================
    GRAPH PLACEHOLDER (team to implement)

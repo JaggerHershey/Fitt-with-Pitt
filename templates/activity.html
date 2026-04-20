@@ -75,6 +75,119 @@
     </div>
 </div>
 
+<!-- Progress Chart -->
+<div class="card" style="margin-top: 16px;">
+    <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+        <span class="card-title">Progress Over Time</span>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <select id="chart-exercise" class="chart-select">
+                <option value="">Select exercise…</option>
+            </select>
+            <div class="chart-metric-tabs">
+                <button class="chart-tab active" data-metric="weight">Weight</button>
+                <button class="chart-tab" data-metric="reps">Reps</button>
+                <button class="chart-tab" data-metric="sets">Sets</button>
+                <button class="chart-tab" data-metric="calories">Calories</button>
+            </div>
+        </div>
+    </div>
+    <div id="chart-empty" class="graph-placeholder" style="display: flex;">Select an exercise above to see your progress</div>
+    <canvas id="activityChart" style="display: none; max-height: 260px;"></canvas>
+</div>
+
+<script type="application/json" id="chart-data">{{ chart_data | tojson }}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const RAW = JSON.parse(document.getElementById('chart-data').textContent);
+
+// Populate exercise dropdown with unique names
+const names = [...new Set(RAW.map(e => e.name))].sort();
+const sel = document.getElementById('chart-exercise');
+names.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+
+const LABELS = { weight: 'Weight (lbs)', reps: 'Reps', sets: 'Sets', calories: 'Calories burned' };
+let activeMetric = 'weight';
+let chart = null;
+
+function buildChart() {
+    const exercise = sel.value;
+    const empty = document.getElementById('chart-empty');
+    const canvas = document.getElementById('activityChart');
+
+    if (!exercise) { empty.style.display = 'flex'; canvas.style.display = 'none'; return; }
+
+    const rows = RAW.filter(e => e.name === exercise && e[activeMetric] != null);
+
+    if (rows.length === 0) {
+        empty.style.display = 'flex';
+        empty.textContent = `No ${activeMetric} data logged for "${exercise}" yet`;
+        canvas.style.display = 'none';
+        return;
+    }
+
+    empty.style.display = 'none';
+    canvas.style.display = 'block';
+
+    const labels = rows.map(e => e.date);
+    const data   = rows.map(e => e[activeMetric]);
+
+    if (chart) chart.destroy();
+    chart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: LABELS[activeMetric],
+                data,
+                borderColor: '#22C55E',
+                backgroundColor: 'rgba(34,197,94,0.08)',
+                pointBackgroundColor: '#22C55E',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.3,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1E1E1E',
+                    borderColor: '#272727',
+                    borderWidth: 1,
+                    titleColor: '#EFEFEF',
+                    bodyColor: '#9CA3AF',
+                    padding: 10,
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#9CA3AF', font: { size: 11 } },
+                    grid:  { color: '#272727' },
+                    border: { color: '#272727' }
+                },
+                y: {
+                    ticks: { color: '#9CA3AF', font: { size: 11 } },
+                    grid:  { color: '#272727' },
+                    border: { color: '#272727' }
+                }
+            }
+        }
+    });
+}
+
+sel.addEventListener('change', buildChart);
+document.querySelectorAll('.chart-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeMetric = btn.dataset.metric;
+        buildChart();
+    });
+});
+</script>
+
 <!-- Log Workout Form -->
 <div class="card" style="margin-top: 16px;">
     <div class="card-header">

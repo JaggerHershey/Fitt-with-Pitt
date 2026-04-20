@@ -99,11 +99,11 @@
                         {% for entry in nutrition_entries %}
                         <tr>
                             <td>{{ entry.food_name }}</td>
-                            <td>{{ entry.serving_size }}g</td>
-                            <td>{{ entry.num_calories }} kcal</td>
-                            <td>{{ entry.grams_of_protein }}g</td>
-                            <td>{{ entry.grams_of_carb }}g</td>
-                            <td>{{ entry.grams_of_fat }}g</td>
+                            <td>{% if entry.serving_size is not none and entry.serving_size != '' %}{{ entry.serving_size }}g{% else %}—{% endif %}</td>
+                            <td>{% if entry.num_calories is not none and entry.num_calories != '' %}{{ entry.num_calories }} kcal{% else %}—{% endif %}</td>
+                            <td>{% if entry.grams_of_protein is not none and entry.grams_of_protein != '' %}{{ entry.grams_of_protein }}g{% else %}—{% endif %}</td>
+                            <td>{% if entry.grams_of_carb is not none and entry.grams_of_carb != '' %}{{ entry.grams_of_carb }}g{% else %}—{% endif %}</td>
+                            <td>{% if entry.grams_of_fat is not none and entry.grams_of_fat != '' %}{{ entry.grams_of_fat }}g{% else %}—{% endif %}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -156,12 +156,89 @@
     </div>
 </div>
 
-<!-- Progress graphs — team to implement -->
+<!-- Body Weight -->
 <div class="card" style="margin-top: 20px;">
     <div class="card-header">
-        <span class="card-title">Progress Over Time</span>
+        <span class="card-title">Body Weight</span>
+        {% if latest_weight %}
+        <span class="text-secondary" style="font-size: 13px;">
+            Last: <strong style="color: var(--text-primary);">{{ latest_weight.weight }} {{ latest_weight.unit }}</strong>
+        </span>
+        {% endif %}
     </div>
-    <div class="graph-placeholder">Graph coming soon</div>
+
+    <!-- Log form -->
+    <form method="POST" action="{{ url_for('log_weight') }}" style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px;">
+        <div class="form-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+            <label for="weight">Weight</label>
+            <input type="number" id="weight" name="weight" step="0.1" min="0" placeholder="175.0" required>
+        </div>
+        <div class="form-group" style="width: 90px; margin-bottom: 0;">
+            <label for="unit">Unit</label>
+            <select id="unit" name="unit">
+                <option value="lbs">lbs</option>
+                <option value="kg">kg</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 2; min-width: 160px; margin-bottom: 0;">
+            <label for="notes">Notes (optional)</label>
+            <input type="text" id="notes" name="notes" placeholder="Morning, after workout…">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-bottom: 1px;">Log</button>
+    </form>
+
+    <!-- Chart -->
+    {% if weight_chart_data %}
+    <script type="application/json" id="weight-data">{{ weight_chart_data | tojson }}</script>
+    <canvas id="weightChart" style="max-height: 260px;"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    (function () {
+        const data = JSON.parse(document.getElementById('weight-data').textContent);
+        const unit = data.length ? data[0].unit : 'lbs';
+        new Chart(document.getElementById('weightChart'), {
+            type: 'line',
+            data: {
+                labels: data.map(e => e.date),
+                datasets: [{
+                    label: 'Body Weight',
+                    data: data.map(e => e.weight),
+                    borderColor: '#22C55E',
+                    backgroundColor: 'rgba(34,197,94,0.08)',
+                    pointBackgroundColor: '#22C55E',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.3,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1E1E1E',
+                        borderColor: '#272727',
+                        borderWidth: 1,
+                        titleColor: '#EFEFEF',
+                        bodyColor: '#9CA3AF',
+                        padding: 10,
+                        callbacks: {
+                            label: ctx => ` ${ctx.parsed.y} ${unit}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#9CA3AF', font: { size: 11 } }, grid: { color: '#272727' }, border: { color: '#272727' } },
+                    y: { ticks: { color: '#9CA3AF', font: { size: 11 }, callback: v => `${v} ${unit}` }, grid: { color: '#272727' }, border: { color: '#272727' } }
+                }
+            }
+        });
+    })();
+    </script>
+    {% else %}
+    <div class="graph-placeholder">Log your first weigh-in above to see your trend</div>
+    {% endif %}
 </div>
 
 {% endblock %}

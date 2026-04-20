@@ -15,6 +15,6 @@ class Nutrition(db.Model):
     grams_of_fat = db.Column(db.Integer)
     additional_details = db.Column(db.String(1000))
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

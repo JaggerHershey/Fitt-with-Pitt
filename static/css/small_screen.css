@@ -488,6 +488,40 @@ button { font-family: inherit; }
 .btn-lg   { padding: 14px 24px; font-size: 16px; }
 
 /* ============================
+   CHART CONTROLS
+   ============================ */
+.chart-select {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+}
+.chart-metric-tabs {
+    display: flex;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: 100%;
+}
+.chart-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+.chart-tab.active { background: var(--accent-dim); color: var(--accent); }
+
+/* ============================
    FLASH MESSAGES
    ============================ */
 .flash-container { margin-bottom: 16px; }
@@ -495,6 +529,7 @@ button { font-family: inherit; }
 .flash {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 10px 14px;
     border-radius: var(--radius);
