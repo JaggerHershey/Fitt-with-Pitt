@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Goals — Fitt with Pitt{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Goals</h1>
+    <p>Set the targets that power your dashboard, nutrition, activity, and weight progress views.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card highlight">
+        <div class="stat-label">Calories Today</div>
+        <div class="stat-value">{{ calories_today }}</div>
+        <div class="stat-unit">{% if nutrition_goal and nutrition_goal.daily_cal %}Goal {{ nutrition_goal.daily_cal }} kcal{% else %}No goal set{% endif %}</div>
+        <div class="progress-bar"><span style="width: {{ calorie_progress }}%;"></span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Protein Today</div>
+        <div class="stat-value">{{ protein_today }}</div>
+        <div class="stat-unit">{% if nutrition_goal and nutrition_goal.daily_protein %}Goal {{ nutrition_goal.daily_protein }} g{% else %}No goal set{% endif %}</div>
+        <div class="progress-bar"><span style="width: {{ protein_progress }}%;"></span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Workouts This Week</div>
+        <div class="stat-value">{{ workouts_this_week }}</div>
+        <div class="stat-unit">Goal {{ activity_goal.weekly_workouts }} sessions</div>
+        <div class="progress-bar"><span style="width: {{ workout_progress }}%;"></span></div>
+    </div>
+</div>
+
+<div class="two-col" style="align-items: start;">
+    <div class="goal-form-stack">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Nutrition Goals</span>
+            </div>
+            <form method="POST" action="{{ url_for('goals') }}">
+                <input type="hidden" name="goal_type" value="nutrition">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="daily_cal">Daily Calories</label>
+                        <input type="number" id="daily_cal" name="daily_cal" value="{{ nutrition_goal.daily_cal if nutrition_goal else '' }}" min="0" placeholder="2200">
+                    </div>
+                    <div class="form-group">
+                        <label for="daily_protein">Daily Protein (g)</label>
+                        <input type="number" id="daily_protein" name="daily_protein" value="{{ nutrition_goal.daily_protein if nutrition_goal else '' }}" min="0" placeholder="180">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="daily_carbs">Daily Carbs (g)</label>
+                        <input type="number" id="daily_carbs" name="daily_carbs" value="{{ nutrition_goal.daily_carbs if nutrition_goal else '' }}" min="0" placeholder="220">
+                    </div>
+                    <div class="form-group">
+                        <label for="daily_fats">Daily Fat (g)</label>
+                        <input type="number" id="daily_fats" name="daily_fats" value="{{ nutrition_goal.daily_fats if nutrition_goal else '' }}" min="0" placeholder="70">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Nutrition Goals</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Activity Goals</span>
+            </div>
+            <form method="POST" action="{{ url_for('goals') }}">
+                <input type="hidden" name="goal_type" value="activity">
+                <div class="form-group">
+                    <label for="weekly_workouts">Weekly Workouts</label>
+                    <input type="number" id="weekly_workouts" name="weekly_workouts" value="{{ activity_goal.weekly_workouts }}" min="1" max="21" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Activity Goal</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Weight Goal</span>
+            </div>
+            <form method="POST" action="{{ url_for('goals') }}">
+                <input type="hidden" name="goal_type" value="weight">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current_weight">Starting Weight</label>
+                        <input type="number" id="current_weight" name="current_weight" value="{{ weight_goal.current_weight if weight_goal else '' }}" min="0" step="0.1" placeholder="185.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="target_weight">Target Weight</label>
+                        <input type="number" id="target_weight" name="target_weight" value="{{ weight_goal.target_weight if weight_goal else '' }}" min="0" step="0.1" placeholder="170.0">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Weight Goal</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Goal Tracking</span>
+        </div>
+        <div class="goal-checklist">
+            <div class="goal-check-item">
+                <span>Calories</span>
+                <span class="badge {% if nutrition_goal and nutrition_goal.daily_cal and calories_today >= nutrition_goal.daily_cal %}badge-green{% else %}badge-amber{% endif %}">
+                    {% if nutrition_goal and nutrition_goal.daily_cal %}{{ calorie_progress }}%{% else %}Set a goal{% endif %}
+                </span>
+            </div>
+            <div class="goal-check-item">
+                <span>Protein</span>
+                <span class="badge {% if nutrition_goal and nutrition_goal.daily_protein and protein_today >= nutrition_goal.daily_protein %}badge-green{% else %}badge-amber{% endif %}">
+                    {% if nutrition_goal and nutrition_goal.daily_protein %}{{ protein_progress }}%{% else %}Set a goal{% endif %}
+                </span>
+            </div>
+            <div class="goal-check-item">
+                <span>Carbs</span>
+                <span class="badge {% if nutrition_goal and nutrition_goal.daily_carbs and carbs_today >= nutrition_goal.daily_carbs %}badge-green{% else %}badge-amber{% endif %}">
+                    {% if nutrition_goal and nutrition_goal.daily_carbs %}{{ carbs_today }} / {{ nutrition_goal.daily_carbs }}g{% else %}Set a goal{% endif %}
+                </span>
+            </div>
+            <div class="goal-check-item">
+                <span>Fat</span>
+                <span class="badge {% if nutrition_goal and nutrition_goal.daily_fats and fat_today >= nutrition_goal.daily_fats %}badge-green{% else %}badge-amber{% endif %}">
+                    {% if nutrition_goal and nutrition_goal.daily_fats %}{{ fat_today }} / {{ nutrition_goal.daily_fats }}g{% else %}Set a goal{% endif %}
+                </span>
+            </div>
+            <div class="goal-check-item">
+                <span>Workouts</span>
+                <span class="badge {% if workouts_this_week >= activity_goal.weekly_workouts %}badge-green{% else %}badge-amber{% endif %}">
+                    {{ workouts_this_week }} / {{ activity_goal.weekly_workouts }}
+                </span>
+            </div>
+            <div class="goal-check-item">
+                <span>Weight</span>
+                <span class="badge {% if weight_goal and weight_goal_remaining is not none and weight_goal_remaining <= 0 %}badge-green{% else %}badge-blue{% endif %}">
+                    {% if weight_goal and latest_weight %}{{ latest_weight.weight }} / {{ weight_goal.target_weight }} {{ latest_weight.unit }}{% else %}Set and log weight{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="goal-summary-card">
+            <div>
+                <div class="goal-summary-label">Weight Goal Progress</div>
+                <div class="goal-summary-value">
+                    {% if weight_goal and weight_goal.target_weight is not none %}
+                        {{ weight_goal.target_weight }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+            <div class="goal-summary-meta">
+                {% if weight_goal_remaining is not none %}
+                <span>{{ weight_goal_remaining }} remaining</span>
+                {% else %}
+                <span>Needs a saved goal and a logged weigh-in</span>
+                {% endif %}
+                <div class="progress-bar"><span style="width: {{ weight_goal_progress }}%;"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
