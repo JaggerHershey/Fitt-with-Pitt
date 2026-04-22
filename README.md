@@ -53,5 +53,5 @@ Project Created By:
    ```
 4. Run the application:
    ```bash
-   python app.py
+   flask --app app --debug run
    ```
