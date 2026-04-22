@@ -6,6 +6,7 @@ from models.nutrition_model import Nutrition
 from models.activity_model import Activity
 from models.goal_model import Goal, ActivityGoal, NutritionGoal, WeightGoal
 from models.bodyweight_model import BodyWeight
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from datetime import datetime, timedelta
 import requests
 import os
@@ -275,7 +276,7 @@ def activity():
         entries = Activity.query.filter_by(user_id=current_user.id).order_by(Activity.created_at.desc()).all()
         
         # Calculate weekly stats
-        today = datetime.utcnow()
+        today = datetime.now()
         start_of_week = today - timedelta(days=today.weekday())
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
         
@@ -424,6 +425,9 @@ def login():
             flash("User does not exist, please make an account.", "info")
             return render_template('login.html', error='Invalid credentials')
         if user.check_password(password=password):
+            if not user.email_verified:
+                flash('Please verify your email before logging in.', 'warning')
+                return render_template('login.html')
             login_user(user, remember=True)
             next = request.args.get('next')
             if next:
@@ -442,9 +446,9 @@ def register():
         password = request.form.get("password")
 
         # Check if invalid email using mailboxlayer api
-        # if not check_email(email=email):
-        #     flash("Email is invalid. Please choose another.", "info")
-        #     return redirect(url_for('register'))
+        if not check_email(email=email):
+            flash("Email is invalid. Please choose another.", "info")
+            return redirect(url_for('register'))
 
         existing_username = User.query.filter_by(username=username).first()
         existing_email = User.query.filter_by(email=email).first()
@@ -459,26 +463,70 @@ def register():
             new_user.set_password(password)
             db.session.add(new_user)
             db.session.commit()
-        
+
+            s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+            token = s.dumps(email, salt='email-verify')
+            verify_url = url_for('verify_email', token=token, _external=True)
+            send_verification_email(email, username, verify_url)
+
+        flash('Account created! Check your email to verify your account before logging in.', 'info')
         return redirect(url_for('login'))
     else:
         return render_template('register.html')
 
-# # mail api layer valid email check
-# def check_email(email):
-#     url = f'https://apilayer.net/api/check?access_key={mail_api_key}&{email}=support@apilayer.com'
-#     # Add error checking for api request
-#     call = request.get(url)
-#     data = json.loads(call)
-#     return data['smtp_check'] == 'true' and data['mx_found'] == 'true' and data['catch_all'] == 'true' and data['disposable'] == 'false' and float(data['score']) > 0.6 
+def check_email(email):
+    url = f'https://apilayer.net/api/check?access_key={mail_api_key}&email={email}'
+    response = requests.get(url)
+    data = response.json()
+    return (
+        data.get('smtp_check') and
+        data.get('mx_found') and
+        not data.get('disposable') and
+        float(data.get('score', 0)) > 0.6
+    )
 
-# # account auth via brevo api
-# @app.route('/email_verified', methods=['POST'])
-# def email_verified():
-#     url = f'{auth_api_key}'
-#     # Add error checking for api request
-#     call = request.get(url)
-#     data = json.loads(call)
+def send_verification_email(user_email, username, verify_url):
+    headers = {
+        'accept': 'application/json',
+        'api-key': auth_api_key,
+        'content-type': 'application/json'
+    }
+    body = {
+        'sender': {'name': 'FittWithPitt', 'email': 'jagger.hershey@hotmail.com'},
+        'to': [{'email': user_email, 'name': username}],
+        'subject': 'Confirm Your FittWithPitt Account',
+        'htmlContent': (
+            f'<html><body>'
+            f'<h2>Welcome to FittWithPitt, {username}!</h2>'
+            f'<p>Click the link below to verify your email address. This link expires in 1 hour.</p>'
+            f'<a href="{verify_url}">Verify my account</a>'
+            f'</body></html>'
+        )
+    }
+    response = requests.post('https://api.brevo.com/v3/smtp/email', headers=headers, json=body)
+    if not response.ok:
+        app.logger.error(f'Brevo error {response.status_code}: {response.text}')
+    return response.ok
+
+@app.route('/verify_email/<token>')
+def verify_email(token):
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = s.loads(token, salt='email-verify', max_age=3600)
+    except SignatureExpired:
+        flash('Verification link has expired. Please register again.', 'danger')
+        # Uncommit user from db due to needing to reregister
+        return redirect(url_for('register'))
+    except BadSignature:
+        flash('Invalid verification link.', 'danger')
+        return redirect(url_for('register'))
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.email_verified = True
+        db.session.commit()
+        flash('Email verified! You can now log in.', 'success')
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 @login_required
