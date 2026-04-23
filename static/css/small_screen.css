@@ -151,6 +151,7 @@ button { font-family: inherit; }
     position: sticky;
     top: 0;
     z-index: 100;
+    min-width: 300px;
 }
 
 .mobile-logo {
@@ -221,6 +222,7 @@ button { font-family: inherit; }
     background: var(--bg-surface);
     border-top: 1px solid var(--border);
     z-index: 100;
+    min-width: 300px;
 }
 
 .mobile-nav-item {
