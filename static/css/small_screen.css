@@ -191,6 +191,7 @@ button { font-family: inherit; }
     flex: 1;
     padding: 20px 16px;
     padding-bottom: calc(var(--bottom-nav-height) + 16px);
+    min-width: 300px;
 }
 
 .page-header { margin-bottom: 20px; }
@@ -392,7 +393,10 @@ button { font-family: inherit; }
 /* ============================
    FORMS (mobile)
    ============================ */
-.form-group { margin-bottom: 14px; }
+.form-group {
+    margin-bottom: 14px;
+    flex: 1 1 calc(50% - 8px);
+}
 
 .form-group label {
     display: block;
@@ -409,7 +413,8 @@ button { font-family: inherit; }
     background: var(--bg-elevated);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
-    padding: 11px 12px;
+    height: 44px;
+    padding: 0px 12px;
     color: var(--text-primary);
     font-size: 16px; /* prevents iOS zoom */
     font-family: inherit;
@@ -882,4 +887,8 @@ button { font-family: inherit; }
 .goal-summary-meta {
     color: var(--text-secondary);
     font-size: 12px;
+}
+
+.button-refactor {
+    height: 44px;
 }

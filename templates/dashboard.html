@@ -194,7 +194,7 @@
     {% endif %}
 
     <!-- Log form -->
-    <form method="POST" action="{{ url_for('log_weight') }}" style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: nowrap; margin-bottom: 20px;">
+    <form method="POST" action="{{ url_for('log_weight') }}" style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px;">
         <div class="form-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
             <label for="weight">Weight</label>
             <input type="number" id="weight" name="weight" step="0.1" min="0" placeholder="175.0" required>
@@ -210,7 +210,7 @@
             <label for="notes">Notes (optional)</label>
             <input type="text" id="notes" name="notes" placeholder="Morning, after workout…">
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-bottom: 1px;">Log</button>
+        <button type="submit" class="btn btn-primary button-refactor" style="margin-bottom: 1px;">Log</button>
     </form>
 
     <!-- Chart -->
